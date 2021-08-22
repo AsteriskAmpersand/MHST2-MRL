@@ -66,27 +66,50 @@ string readAttribute(Attribute &a){
     return a.name.name;
 };
 
-struct DataPointer{
-        Printf("%s - %d\n",name1,index);
-        
+
+struct stringPointer{
+    uint64 strPointer;
+    local int returnAdd = FTell();
+    FSeek(Header.stringTableOffset+strPointer);
+    string str;
+    FSeek(returnAdd);
+};
+
+string readStringPointer(stringPointer &strp){
+    return strp.str;
+};
+
+struct PointerSubEntry{
+    stringPointer name3Pointer<read = readStringPointer>;
+    byte unknData[0x20];
+    uint64 furtherDataPointer;
+    local int returnAdd0 = FTell();
+    FSeek(furtherDataPointer);
+    stringPointer name5Pointer<read = readStringPointer>;
+    FSeek(returnAdd0);
+};
+
+struct PointerEntry{
+    stringPointer name3Pointer<read = readStringPointer>;
+    byte unknData[0x20];
+    uint64 furtherDataPointer;
+    local int returnAdd0 = FTell();
+    FSeek(furtherDataPointer);
+
+    stringPointer name4JpPointer<read = readStringPointer>;
+    if (name4JpPointer.strPointer){
+    stringPointer name4Pointer<read = readStringPointer>;
+    };
+
+    FSeek(returnAdd0);
+};
+
+struct DataPointer{        
         FSeek(dataPointer);
-        uint64 name3Pointer;
-        byte unknData[0x20];
-        uint64 furtherDataPointer;
-        FSeek(furtherDataPointer);
-        uint64 name4JpPointer;
-        uint64 name4Pointer;
-
-        returnAdd = FTell();
-        FSeek(Header.stringTableOffset+name3Pointer);
-        string name3;
-
-        FSeek(Header.stringTableOffset+name4JpPointer);
-        string name4Jp;
-
-        FSeek(Header.stringTableOffset+name4Pointer);
-        string name4;
-        FSeek(returnAdd);
+        if (field_8_c > 0)
+            PointerEntry entry<optimize=false>;
+        if (field_8_c > 1)
+            PointerSubEntry subentry;
 };
 
 struct MFXEntry{
@@ -100,6 +123,7 @@ struct MFXEntry{
     FSeek(returnAdd);
     uint field_8_a : 6;
     uint field_8_b : 16;
+    uint field_8_c : 10;
     ushort unknShort;
     ushort index;
     uint field_C;
@@ -114,6 +138,8 @@ struct MFXEntry{
         Attribute attribute[attributeCount]<read=readAttribute,optimize=false>;
     };
     if (dataPointer){
+
+        Printf("%s - %d|%d\n",name1,index,string2);
         DataPointer addedData<bgcolor = 0xAA88CC, optimize=false>;
     }
     

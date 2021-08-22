@@ -26,6 +26,9 @@ def crc32(string):
     return -1 - value
 
 def jamcrc32(string):
+    return numericJam(string).to_bytes(4,"little")
+
+def numericJam(string):
     crc = crc32(string)
     jam = (int((crc^0xFFFFFFFF)) & 0xFFFFFFFF)
-    return jam.to_bytes(4,"little")
+    return jam
