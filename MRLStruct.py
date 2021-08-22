@@ -63,8 +63,7 @@ class MRLProperty(PyCStruct):
     fields = {"hash":'uint32',
               'value':'uint32'}#Probably should use int
     def marshall(self,stream):
-        super().marshall(stream)
-        self.next = self.hash == 1 or self.hash == 0#260 for premade buffers?
+        super().marshall(stream)        
         if self.hash in hashMap:
             self.name = hashMap[self.hash]
             #print(self.name)
@@ -72,6 +71,7 @@ class MRLProperty(PyCStruct):
             #print("Unknown hash %X"%self.hash)
             self.name = None
         self.active = NULL != self.value
+        self.next = self.hash == 0 or self.name == '$Globals'#260 for premade buffers?
         return self
     def construct(self,data):
         if data['name'] in inverseHashMap:
@@ -105,10 +105,9 @@ class MaterialBuffer():
         active = 0
         while stream.tell() < sentinel:
             prop = operator[active](stream)
+            storage[active].append(prop)
             if active < 2 and prop.next:
-                active+=1
-            else:
-                storage[active].append(prop)
+                active+=1                
         return self
     def __getitem__(self,ix):
         return self.properties[ix]
@@ -118,7 +117,7 @@ class MaterialBuffer():
         string = ''
         string+='\t'+spacer
         plen,vlen = len(self.properties),len(self.values)
-        string+='\tProperties (%d/%d) [%d]: \n'%(plen,vlen,4*(plen-1))
+        string+='\tProperties (%d/%d) [%d]: \n'%(plen,vlen,4*(plen))
         string+='\t'+spacer
         for ix,prop in enumerate(self.properties):
             string += '\t'+str(ix)+": "+str(prop)+'\n'
@@ -175,9 +174,9 @@ if __name__ in '__main__':
     i = 0
     from pathlib import Path
     filelist = Path(r"C:\Users\Asterisk\Documents\MHST2").rglob('*mrl')
-    filelist = [r"C:\Users\Asterisk\Documents\MHST2\archive\stage\v05_01\v05_01_field\stage\_common_sky\common01_noon.mrl"]
+    #filelist = [r"C:\Users\Asterisk\Documents\MHST2\archive\stage\v05_01\v05_01_field\stage\_common_sky\common01_noon.mrl"]
     for file in filelist:
         mrl = MRLFile(file)
-        raise
+        #raise
         if i > 10: raise
         i += 1

@@ -1,0 +1,136 @@
+//------------------------------------------------
+//--- 010 Editor v9.0 Binary Template
+//
+//      File: 
+//   Authors: 
+//   Version: 
+//   Purpose: 
+//  Category: 
+// File Mask: 
+//  ID Bytes: 
+//   History: 
+//------------------------------------------------
+  
+//------------------------------------------------
+//--- 010 Editor v9.0.2 Binary Template
+//
+//      File: 
+//   Authors: 
+//   Version: 
+//   Purpose: 
+//  Category: 
+// File Mask: 
+//  ID Bytes: 
+//   History: 
+//------------------------------------------------
+local int i;
+local int j;
+typedef struct{
+    byte MFX0[4];
+    short reserved_4;
+    short reserved_6;
+    int field_8;
+    int entryCount;
+    int stringTableOffset;
+    int field_14;
+}MFXHeader;
+
+struct MFXEntryOffsets{
+    uint64 offset[Header.entryCount];
+};
+struct MFXStringTable{
+    string entryName;
+};
+typedef struct{
+    string name;
+}Name;
+
+typedef struct{
+    uint64 strOffset;
+    uint u1 : 6;
+    uint comp_type : 5;
+
+    uint comp_count : 7;
+    uint unknown : 4;
+
+    uint base_off : 9;
+    uint instancing : 1;
+    uint null;
+    returnAdd = FTell();
+    FSeek(Header.stringTableOffset+strOffset);
+    Name name<optimize=false>;
+    FSeek(returnAdd);
+}Attribute;
+
+string readAttribute(Attribute &a){
+    return a.name.name;
+};
+
+struct DataPointer{
+        Printf("%s - %d\n",name1,index);
+        
+        FSeek(dataPointer);
+        uint64 name3Pointer;
+        byte unknData[0x20];
+        uint64 furtherDataPointer;
+        FSeek(furtherDataPointer);
+        uint64 name4JpPointer;
+        uint64 name4Pointer;
+
+        returnAdd = FTell();
+        FSeek(Header.stringTableOffset+name3Pointer);
+        string name3;
+
+        FSeek(Header.stringTableOffset+name4JpPointer);
+        string name4Jp;
+
+        FSeek(Header.stringTableOffset+name4Pointer);
+        string name4;
+        FSeek(returnAdd);
+};
+
+struct MFXEntry{
+    uint64 string1;
+    uint64 string2;
+    local uint returnAdd = FTell();
+    FSeek(Header.stringTableOffset+string1);
+    string name1;
+    FSeek(Header.stringTableOffset+string2);
+    string name2;
+    FSeek(returnAdd);
+    uint field_8_a : 6;
+    uint field_8_b : 16;
+    ushort unknShort;
+    ushort index;
+    uint field_C;
+    uint field_10;
+    uint64 dataPointer;
+    ubyte attributeCount;
+    ubyte unkn8;
+    ushort bufferSize;
+    if(field_8_a == 9){
+        uint unkn;
+        uint64 unkn8;
+        Attribute attribute[attributeCount]<read=readAttribute,optimize=false>;
+    };
+    if (dataPointer){
+        DataPointer addedData<bgcolor = 0xAA88CC, optimize=false>;
+    }
+    
+};
+
+string readStrings(MFXEntry &p){
+    string s;
+    SPrintf( s, "%s, %s", (string)p.name1,(string)p.name2);
+    return s;
+}
+
+MFXHeader Header<bgcolor = 0xFF00FF>;
+FSkip(8);
+MFXEntryOffsets EntryOffsets<bgcolor = 0xFFFF00>;
+for(i=0;i<Header.entryCount;i++){
+    if (EntryOffsets.offset[i] != 1){
+        FSeek(EntryOffsets.offset[i]);
+        MFXEntry Entry<read=readStrings,bgcolor = 0x00FFFF>;
+    }
+};
