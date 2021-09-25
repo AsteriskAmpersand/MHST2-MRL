@@ -19,6 +19,9 @@ inverseHashMap = {val:key for key,val in hashMap.items()}
 
 NULL = 0xCDCDCDCD
 
+def print(*args,**kwargs):
+    pass
+
 class MRLHeader(PyCStruct):
     fields = {"id":"long",
               "unkn":"uint",
@@ -171,12 +174,29 @@ def MRLFile(filepath):
     return mrl
 
 if __name__ in '__main__':
+    import csv
+    
     i = 0
     from pathlib import Path
     filelist = Path(r"C:\Users\Asterisk\Documents\MHST2").rglob('*mrl')
+    keys = []
+    data = []
     #filelist = [r"C:\Users\Asterisk\Documents\MHST2\archive\stage\v05_01\v05_01_field\stage\_common_sky\common01_noon.mrl"]
     for file in filelist:
         mrl = MRLFile(file)
+        for material in mrl.materials:
+            md = material.dict()
+            keys = md.keys()
+            data.append({**md,"file":str(file)})
         #raise
-        if i > 10: raise
-        i += 1
+        #if i > 10: raise
+        #i += 1
+    
+    f = open('mrlDB.csv','w')
+    w = csv.DictWriter(f,["file"]+list(keys))
+    w.writeheader()
+    w.writerows(data)
+    f.close()
+    
+#import pandas as pd
+#mrlDB = pd.read_csv("mrlDB.csv")

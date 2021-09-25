@@ -263,6 +263,8 @@ class PyCStruct(metaclass = RegisteredClass):
             return "%s: "%(type(self))+str({property:getattr(self,property) for property in self.fields})
         except:
             return "Unconstructed %s: "%(type(self))+str(self.__dict__.keys())
+    def dict(self):
+        return {property:getattr(self,property) for property in self.fields}
     
 class Mod3Container():
     def __init__(self, Mod3Class, containeeCount = 0):
